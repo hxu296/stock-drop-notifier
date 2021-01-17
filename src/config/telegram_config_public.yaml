@@ -1,0 +1,12 @@
+token: YOUR_TOKEN
+path_to_telegram_reply_dict: config/telegram_reply_dictionary.yaml
+path_to_telegram_config: config/telegram_config.yaml
+default_request_frequency: 0.2
+default_update_interval: 3
+default_rest_time:
+  - 23
+  - 8
+default_forbidden_words: []
+
+
+

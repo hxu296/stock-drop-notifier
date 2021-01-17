@@ -1,0 +1,7 @@
+__pycache__
+ideas/
+.ideas/
+src/log
+venv/
+src/config/telegram_config.yaml
+src/config/listener_config/*.yaml
