@@ -1,6 +1,7 @@
 __pycache__
 ideas/
 .ideas/
+runserver.py
 src/log/server_log/*
 !src/log/server_log/.gitkeep
 src/log/listener_log/*

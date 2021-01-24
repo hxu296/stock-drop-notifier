@@ -1,11 +1,18 @@
 # Stock Drop Notifier
 
 ### Quick Start
-This project is still in the early stage of development. To run it as it is, you need to do the following:
-1. receive your telegram bot token from BotFather.
-2. add your telegram bot token to the token field of src/config/telegram_config_public.yaml
-3. run `python public.py` from the project root directory.
-4. talk to your Telegram bot using commands from [command.md](command.md)
+This project is still at the early stage of development. To run it as it is, you need to do the following:
+1. run the following commands to set up the run time environment. 
+ ```
+    git clone https://github.com/hxu296/StockDropNotifier.git 
+    cd StockDropNotifier
+    pip -r install requirements.txt
+    pip install python-telegram-bot --upgrade
+```
+2. receive your telegram bot token from BotFather.
+3. add your telegram bot token to the token field of src/config/telegram_config_public.yaml
+4. run `python public.py` from the project root directory.
+5. talk to your Telegram bot using commands from [command.md](command.md)
 
 ### About
 
