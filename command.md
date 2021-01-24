@@ -15,10 +15,9 @@ List filter or notifier information. Upon sending /list, a keyboard menu will sh
 Add a notifier using the current filter. This command does not require any parameter, but it can only be used after all required fields of filter are specified.
 
 #### /rm ####
-Remove one or more notifiers by name or id. Both name and id of a notifier can be found using /list. Examples of this command are as follows:
-- /rm gawain
+Remove one or more notifiers by id, which can be found using /list. Examples of this command are as follows:
+- /rm 12391
 - /rm 31259 50028
-- /rm gawain, 50016, beowulf
 
 #### !search ####
 This command is used to customize the search_words parameter of a filter, which is a ***required*** parameter filed. To use this command, follow !search with a list of space-separated words for whom a newly added notifier will search. Examples of this command are as follows:
