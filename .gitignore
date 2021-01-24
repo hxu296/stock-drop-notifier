@@ -1,7 +1,9 @@
 __pycache__
 ideas/
 .ideas/
-src/log
+src/log/*
+!src/log/server_log/.gitkeep
+!src/log/listener_log/.gitkeep
 venv/
 src/config/telegram_config.yaml
 src/config/listener_config/*
