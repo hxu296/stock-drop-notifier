@@ -75,11 +75,9 @@ class Server:
         context.user_data['choice'] = choice
         if choice == 'notifier':
             if 'notifiers' in user_data and user_data['notifiers']:
-                print('reached if')
                 notifiers = user_data['notifiers']
                 reply = self.reply_dict['list_choice']
                 reply_keyboard = [[notifier['id'] for notifier in notifiers.values()]]
-                print(reply_keyboard)
                 context.bot.send_message(chat_id=chat_id,
                                         text=reply,
                                         reply_markup=ReplyKeyboardMarkup(reply_keyboard, one_time_keyboard=True))
@@ -87,6 +85,7 @@ class Server:
             else:
                 reply = self.reply_dict['list_empty']
                 context.bot.send_message(chat_id=chat_id, text=reply)
+                return ConversationHandler.END
         elif choice == 'filter':
             if 'filter' not in user_data:
                 user_data['filter'] = self.new_filter()
@@ -118,10 +117,10 @@ class Server:
             curr_filter['path_to_telegram_config'] = self.config['path_to_telegram_config']
             path_to_listener_config = self.dump_listener_config(curr_filter)
             pid = self.start_listener(path_to_listener_config)
-            curr_filter['id'] = pid
             del curr_filter['chat_id']
             del curr_filter['path_to_telegram_config']
             user_data['notifiers'][pid] = curr_filter
+            user_data['notifiers'][pid]['id'] = pid
             reply = '{}\nnotifier id: {}'.format(self.reply_dict['add_success'], pid)
             context.bot.send_message(chat_id=chat_id, text=reply)
         except Exception as e:
@@ -136,12 +135,15 @@ class Server:
                 raise TypeError(self.reply_dict['rm_error'])
             for arg in context.args:
                 pid = int(arg)
-                os.kill(pid, signal.SIGKILL)
-                del user_data['notifiers'][pid]
+                if 'notifiers' in user_data and pid in user_data['notifiers']:
+                    os.kill(pid, signal.SIGKILL)
+                    del user_data['notifiers'][pid]
+                else:
+                    raise TypeError(self.reply_dict['rm_error'])
             reply = '{}\nnotifier {} removed.'.format(self.reply_dict['rm_success'], context.args)
             context.bot.send_message(chat_id=chat_id, text=reply)
         except Exception as e:
-            reply = '{}\n{}'.format(self.reply_dict['rm_failure'], str(e))
+            reply = '{}\n{}'.format(self.reply_dict['rm_failure'], e.args[0])
             context.bot.send_message(chat_id=chat_id, text=reply)
 
     def search(self, args):

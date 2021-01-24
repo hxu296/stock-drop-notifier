@@ -1,5 +1,5 @@
-start: "Nice to meet you!\n\nMy name is StockDrop, and I'm your notifier manager. You can give me the following commands:\n\n/help - Show this help message again\n/ls - List all notifiers\n/add - Add a new notifier\n/rm - Remove a notifier\n\nAlways at your service."
-help: "You can give me the following commands:\n\n/help - Show this help message again\n/ls - List all notifiers\n/add - Add a new notifier\n/rm - Remove a notifier\n"
+start: "Nice to meet you!\n\nMy name is StockDrop, and I'm your notifier manager. command instruction needs update. Refer to command.md for the most recent info."
+help: "command instruction needs update. Refer to command.md for the most recent info. "
 list_start: "Please select the type you want to list."
 list_choice: "Press for more information."
 list_empty: "No information to display."
