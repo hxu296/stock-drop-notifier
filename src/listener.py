@@ -39,7 +39,7 @@ class Listener:
         path_to_log = 'log/listener_log/user_{}/{}.log'.format(self.chat_id, self.name)
         os.popen('touch {}'.format(path_to_log))
         logging.basicConfig(format='%(asctime)s - %(name)s - %(levelname)s - %(message)s',
-                            level=logging.INFO, filename=path_to_log)
+                            level=logging.INFO, filename=path_to_log, filemode='w')
 
     def load_config(self, path_to_config):
         with open(path_to_config, 'r') as handler:
@@ -77,6 +77,7 @@ class Listener:
             # get product urls
             for product_index_url in product_index_urls:
                 self.product_urls.extend(self.parser.get_product_urls(self.get_page(product_index_url)))
+            logging.info('generated {} urls'.format(len(self.product_urls)))
 
     def scan_url(self):
         # iterate through self.product_url list
@@ -89,6 +90,9 @@ class Listener:
                 dealer = self.parser.get_dealer(product_url, product_page)
                 price = self.parser.get_price(product_url, product_page)
                 is_in_stock = self.parser.get_inventory(product_url, product_page)
+                logging.debug('scan result:\nname: {}\ndealer: {}\nprice: {}\nin_stock: {}\nurl: {}'.format(
+                    name, dealer, price, is_in_stock, product_url
+                ))
                 # check whether product's name is valid
                 name_is_valid = True
                 for word in self.forbidden_words:
@@ -100,11 +104,11 @@ class Listener:
                     if is_in_stock:
                         self.send_stock(product_url, price, dealer)
                 else:
-                    logging.info('remove {} for it is invalid'.format(product_url))
+                    logging.info('remove invalid url: {}'.format(product_url))
                     bad_urls.append(product_url)
             except Exception as e: 
                 # if this url causes an exception, append it to bad_urls
-                logging.warning('remove {} for it causes exception'.format(product_url))
+                logging.error('remove erroneous url: {}'.format(product_url))
                 bad_urls.append(product_url)
         # remove all urls in bad_urls from self.product_urls
         if len(bad_urls) != 0:
@@ -119,6 +123,7 @@ class Listener:
         # get page from request
         req = requests.get(url, timeout=5)
         page = req.text
+        logging.debug('got page')
         return page
 
     def time(self):
@@ -133,10 +138,11 @@ class Listener:
 
     def send_stock(self, url, price, dealer):
         msg = 'Stock Refilled!\nDealer:{}\nPrice:{}\nURL:{}'.format(dealer, price, url)
-        self.send_msg(msg)			
+        self.send_msg(msg)
 
     def send_msg(self, msg):
         self.sender.send_message(msg, self.chat_id)
+        logging.info('sent msg to user: {}'.format(msg))
     
     def run(self):
         try:
@@ -154,9 +160,10 @@ class Listener:
                 self.scan_url()
         except Exception as e:
                 # an unexpected exception occurred, notify the user and terminate this process
-                self.send_msg('AN INTERNAL ERROR OCCURED. {} bot ABORTS.\nERROR MSG: {}'.format(
-                self.name, str(e)))
-                logging.error(str(e))
+                error_msg = 'AN INTERNAL ERROR OCCURED. {} bot ABORTS.\nERROR MSG: {}'.format(
+                self.name, str(e))
+                self.send_msg(error_msg)
+                logging.critical(error_msg)
 
 def main():
     parser = argparse.ArgumentParser(description='fire up a listener with the filter specified in config')

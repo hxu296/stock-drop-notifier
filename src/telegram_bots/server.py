@@ -17,7 +17,7 @@ class Server:
 
     def __init__(self, path_to_config):
         logging.basicConfig(format='%(asctime)s - %(name)s - %(levelname)s - %(message)s',
-                            level=logging.INFO, filename='log/server_log/server.log')
+                            level=logging.INFO, filename='log/server_log/server.log', filemode='w')
         self.config = self.load_config(path_to_config)
         self.token = self.config['token']
         path_to_reply_dict = self.config['path_to_telegram_reply_dict']
@@ -37,6 +37,14 @@ class Server:
             'rest': 'rest_time'
         }
 
+    def send_msg(self, update, context, reply, markup=None):
+        chat_id = update.effective_chat.id
+        if markup:
+            context.bot.send_message(chat_id=chat_id, text=reply, reply_markup=markup)
+        else:
+            context.bot.send_message(chat_id=chat_id, text=reply)
+        logging.info('sent msg to user {}: {}'.format(chat_id, reply))
+
     def load_config(self, path_to_config):
         with open(path_to_config, 'r') as handler:
             config = yaml.full_load(handler)
@@ -48,28 +56,24 @@ class Server:
         return reply_dict
 
     def start(self, update, context):
-        chat_id = update.effective_chat.id
+        logging.info('received /start from user {}'.format(update.effective_chat.id))
         reply = self.reply_dict['start']
-        context.bot.send_message(chat_id=chat_id, text=reply)
+        self.send_msg(update, context, reply)
 
     def help(self, update, context):
-        chat_id = update.effective_chat.id
+        logging.info('received /help from user {}'.format(update.effective_chat.id))
         reply = self.reply_dict['help']
-        context.bot.send_message(chat_id=chat_id, text=reply)
+        self.send_msg(update, context, reply)
 
     def list_start(self, update, context):
-        chat_id = update.effective_chat.id
+        logging.info('received /list from user {}'.format(update.effective_chat.id))
         reply = self.reply_dict['list_start']
         reply_keyboard = [['filter', 'notifier']]
-        context.bot.send_message(
-            chat_id=chat_id,
-            text=reply,
-            reply_markup=ReplyKeyboardMarkup(reply_keyboard, one_time_keyboard=True)
-        )
+        markup = ReplyKeyboardMarkup(reply_keyboard, one_time_keyboard=True)
+        self.send_msg(update, context, reply, markup)
         return 'list_choice'
 
     def list_choice(self, update, context):
-        chat_id = update.effective_chat.id
         user_data = context.user_data
         choice = update.message.text
         context.user_data['choice'] = choice
@@ -78,33 +82,32 @@ class Server:
                 notifiers = user_data['notifiers']
                 reply = self.reply_dict['list_choice']
                 reply_keyboard = [[notifier['id'] for notifier in notifiers.values()]]
-                context.bot.send_message(chat_id=chat_id,
-                                        text=reply,
-                                        reply_markup=ReplyKeyboardMarkup(reply_keyboard, one_time_keyboard=True))
+                markup = ReplyKeyboardMarkup(reply_keyboard, one_time_keyboard=True)
+                self.send_msg(update, context, reply, markup)
                 return 'list_notifier'
             else:
                 reply = self.reply_dict['list_empty']
-                context.bot.send_message(chat_id=chat_id, text=reply)
+                self.send_msg(update, context, reply)
                 return ConversationHandler.END
         elif choice == 'filter':
             if 'filter' not in user_data:
                 user_data['filter'] = self.new_filter()
             reply = '{}\n{}'.format(self.reply_dict['list_filter'], str(user_data['filter']))
-            context.bot.send_message(chat_id=chat_id, text=reply)
+            self.send_msg(update, context, reply)
             return ConversationHandler.END
 
     def list_notifier(self, update, context):
-        chat_id = update.effective_chat.id
         user_data = context.user_data
         pid = int(update.message.text)
         config = user_data['notifiers'][pid]
         reply = '{}\n{}'.format(self.reply_dict['list_notifier'], str(config))
-        context.bot.send_message(chat_id=chat_id, text=reply)
+        self.send_msg(update, context, reply)
         return ConversationHandler.END
 
     def add(self, update, context):
         chat_id = update.effective_chat.id
         user_data = context.user_data
+        logging.info('received /add from user {}'.format(chat_id))
         if 'notifiers' not in user_data:
             user_data['notifiers'] = {}
         if 'filter' not in user_data:
@@ -122,29 +125,34 @@ class Server:
             user_data['notifiers'][pid] = curr_filter
             user_data['notifiers'][pid]['id'] = pid
             reply = '{}\nnotifier id: {}'.format(self.reply_dict['add_success'], pid)
-            context.bot.send_message(chat_id=chat_id, text=reply)
+            self.send_msg(update, context, reply)
         except Exception as e:
+            logging.error('/add request from user {} encounters an error: {}'.format(chat_id, e.args[0]))
             reply = '{}\n{}'.format(self.reply_dict['add_failure'], e.args[0])
-            context.bot.send_message(chat_id=chat_id, text=reply)
+            self.send_msg(update, context, reply)
 
     def rm(self, update, context):
         chat_id = update.effective_chat.id
         user_data = context.user_data
+        args = context.args
+        logging.info('received /rm from user {}'.format(chat_id))
         try:
-            if any([not arg.isnumeric() for arg in context.args]):
+            if len(args) == 0 or any([not arg.isnumeric() for arg in args]):
                 raise TypeError(self.reply_dict['rm_error'])
-            for arg in context.args:
+            for arg in args:
                 pid = int(arg)
                 if 'notifiers' in user_data and pid in user_data['notifiers']:
                     os.kill(pid, signal.SIGKILL)
                     del user_data['notifiers'][pid]
                 else:
                     raise TypeError(self.reply_dict['rm_error'])
-            reply = '{}\nnotifier {} removed.'.format(self.reply_dict['rm_success'], context.args)
-            context.bot.send_message(chat_id=chat_id, text=reply)
+            reply = '{}\nnotifier {} removed.'.format(self.reply_dict['rm_success'], args)
+            self.send_msg(update, context, reply)
         except Exception as e:
+            logging.error('/rm request from user {} encounters an error: {}'.format(
+                update.effective_chat.id, e.args[0]))
             reply = '{}\n{}'.format(self.reply_dict['rm_failure'], e.args[0])
-            context.bot.send_message(chat_id=chat_id, text=reply)
+            self.send_msg(update, context, reply)
 
     def search(self, args):
         return self.filter_keys['search'], args
@@ -157,7 +165,6 @@ class Server:
             raise TypeError(self.reply_dict['price_error'])
         elif not args[0].isnumeric():
             raise TypeError(self.reply_dict['price_error'])
-
         return self.filter_keys['price'], int(args[0])
 
     def rest(self, args):
@@ -204,6 +211,7 @@ class Server:
         chat_id = update.effective_chat.id
         user_data = context.user_data
         message = update.message.text
+        logging.info('receiving filter from user {}'.format(chat_id))
         # add filter dictionary to user_data if necessary
         if 'filter' not in user_data.keys():
             user_data['filter'] = self.new_filter()
@@ -213,14 +221,14 @@ class Server:
             filter_key, filter_val = self.dispatcher[filter_prompt](context.args)
             user_data['filter'][filter_key] = filter_val
             reply = '{}\nchanged {} to {}.'.format(self.reply_dict['filter_success'], filter_key, filter_val)
-            context.bot.send_message(chat_id=chat_id, text=reply)
+            self.send_msg(update, context, reply)
         except TypeError as e:
             reply = '{}\n{}'.format(self.reply_dict['filter_failure'], e.args[0])
-            context.bot.send_message(chat_id=chat_id, text=reply)
+            self.send_msg(update, context, reply)
             pass
         except ValueError as e:
             reply = '{}\n{}'.format(self.reply_dict['filter_warning'], e.args[0]['message'])
-            context.bot.send_message(chat_id=chat_id, text=reply)
+            self.send_msg(update, context, reply)
             user_data['filter'][e.args[0]['filter_key']] = e.args[0]['filter_val']
 
     def start_listener(self, from_listener_to_config):
@@ -261,5 +269,8 @@ class Server:
         filter_handler = PrefixHandler('!', ['search', 'forbid', 'price', 'rest', 'freq', 'refresh'], self.filter)
         dispatcher.add_handler(filter_handler)
 
-        updater.start_polling()
-        updater.idle()
+        try:
+            updater.start_polling()
+            updater.idle()
+        except Exception as e:
+            logging.critical(str(e))
