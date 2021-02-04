@@ -273,4 +273,5 @@ class Server:
             updater.start_polling()
             updater.idle()
         except Exception as e:
+            print('server.py: error running server: {}'.format(e))
             logging.critical(str(e))
