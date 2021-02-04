@@ -10,9 +10,8 @@ This project is still at the early stage of development. To run it as it is, you
     pip install python-telegram-bot --upgrade
 ```
 2. receive your telegram bot token from BotFather.
-3. add your telegram bot token to the token field of src/config/telegram_config_public.yaml
-4. run `pythone3.8 public.py` from the project root directory.
-5. talk to your Telegram bot using commands from [command.md](command.md)
+3. run `pythone3.8 run.py -m` from the project root directory and paste your bot token according to the instruction.
+4. talk to your Telegram bot using commands from [command.md](command.md)
 
 ### About
 
