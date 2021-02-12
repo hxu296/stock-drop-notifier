@@ -11,6 +11,7 @@ import logging
 import os
 import signal
 import subprocess
+from copy import deepcopy
 
 
 class Server:
@@ -81,7 +82,7 @@ class Server:
             if 'notifiers' in user_data and user_data['notifiers']:
                 notifiers = user_data['notifiers']
                 reply = self.reply_dict['list_choice']
-                reply_keyboard = [[notifier['id'] for notifier in notifiers.values()]]
+                reply_keyboard = [list(notifiers.keys())]
                 markup = ReplyKeyboardMarkup(reply_keyboard, one_time_keyboard=True)
                 self.send_msg(update, context, reply, markup)
                 return 'list_notifier'
@@ -104,7 +105,7 @@ class Server:
         self.send_msg(update, context, reply)
         return ConversationHandler.END
 
-    def add(self, update, context):
+    def add(self, update, context, receivers=list()):
         chat_id = update.effective_chat.id
         user_data = context.user_data
         logging.info('received /add from user {}'.format(chat_id))
@@ -113,22 +114,39 @@ class Server:
         if 'filter' not in user_data:
             user_data['filter'] = self.new_filter()
         try:
-            curr_filter = user_data['filter']
+            curr_filter = deepcopy(user_data['filter'])
             if any([value is None for value in curr_filter.values()]):
                 raise TypeError(self.reply_dict['add_error'])
             curr_filter['chat_id'] = chat_id
+            receivers.append(chat_id)
+            curr_filter['receivers'] = receivers
             curr_filter['path_to_telegram_config'] = self.config['path_to_telegram_config']
             path_to_listener_config = self.dump_listener_config(curr_filter)
             pid = self.start_listener(path_to_listener_config)
             del curr_filter['chat_id']
             del curr_filter['path_to_telegram_config']
+            curr_filter['id'] = pid
             user_data['notifiers'][pid] = curr_filter
-            user_data['notifiers'][pid]['id'] = pid
             reply = '{}\nnotifier id: {}'.format(self.reply_dict['add_success'], pid)
             self.send_msg(update, context, reply)
         except Exception as e:
             logging.error('/add request from user {} encounters an error: {}'.format(chat_id, e.args[0]))
             reply = '{}\n{}'.format(self.reply_dict['add_failure'], e.args[0])
+            self.send_msg(update, context, reply)
+
+    def addshare(self, update, context):
+        chat_id = update.effective_chat.id
+        args = context.args
+        logging.info('received /addshare from user {}'.format(chat_id))
+        try:
+            if len(args) == 0 or any([not arg.isnumeric() for arg in args]):
+                raise TypeError(self.reply_dict['addshare_error'])
+            receivers = [int(arg) for arg in args]
+            self.add(update, context, receivers)
+        except Exception as e:
+            logging.error('/addshare request from user {} encounters an error: {}'.format(
+                chat_id, e.args[0]))
+            reply = '{}\n{}'.format(self.reply_dict['addshare_failure'], e.args[0])
             self.send_msg(update, context, reply)
 
     def rm(self, update, context):
@@ -149,8 +167,7 @@ class Server:
             reply = '{}\nnotifier {} removed.'.format(self.reply_dict['rm_success'], args)
             self.send_msg(update, context, reply)
         except Exception as e:
-            logging.error('/rm request from user {} encounters an error: {}'.format(
-                update.effective_chat.id, e.args[0]))
+            logging.error('/rm request from user {} encounters an error: {}'.format(chat_id, e.args[0]))
             reply = '{}\n{}'.format(self.reply_dict['rm_failure'], e.args[0])
             self.send_msg(update, context, reply)
 
@@ -263,6 +280,9 @@ class Server:
         add_handler = CommandHandler('add', self.add)
         dispatcher.add_handler(add_handler)
 
+        addshare_handler = CommandHandler('addshare', self.addshare)
+        dispatcher.add_handler(addshare_handler)
+
         rm_handler = CommandHandler('rm', self.rm)
         dispatcher.add_handler(rm_handler)
 
@@ -275,3 +295,4 @@ class Server:
         except Exception as e:
             print('server.py: error running server: {}'.format(e))
             logging.critical(str(e))
+            quit()

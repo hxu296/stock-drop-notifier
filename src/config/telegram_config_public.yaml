@@ -6,4 +6,4 @@ default_rest_time:
 default_update_interval: 3
 path_to_telegram_config: config/telegram_config_public.yaml
 path_to_telegram_reply_dict: config/telegram_reply_dictionary.yaml
-token: 12345678:aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa
+token: 111111111:aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa

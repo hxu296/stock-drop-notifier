@@ -17,6 +17,7 @@ class Listener:
         path_to_telegram_config = self.config['path_to_telegram_config']
         self.sender = Sender(path_to_telegram_config)
         self.chat_id = self.config['chat_id']
+        self.receivers = self.config['receivers']
         self.search_words = self.config['search_words']
         self.search_words = [word.lower() for word in self.search_words]
         self.forbidden_words = self.config['forbidden_words'] 
@@ -31,7 +32,11 @@ class Listener:
         self.get_page_time = time.time()
 
         self.load_logger()
-        self.send_msg('{} bot starts running'.format(self.name))
+
+        initial_msg = '{} bot starts running'.format(self.name)
+        if len(self.receivers) > 1:
+            initial_msg = 'shared ' + initial_msg
+        self.send_msg(initial_msg)
 
     def load_logger(self):
         if not os.path.exists('log/listener_log/user_{}'.format(self.chat_id)):
@@ -68,7 +73,7 @@ class Listener:
 
 
     def generate_url(self):
-        self.product_urls = []
+        self.product_urls = set()
         # generate product urls for each search word
         for word in self.search_words:
             # get product index urls
@@ -76,12 +81,12 @@ class Listener:
             product_index_urls = self.parser.get_product_index_urls(search_url, self.get_page(search_url))
             # get product urls
             for product_index_url in product_index_urls:
-                self.product_urls.extend(self.parser.get_product_urls(self.get_page(product_index_url)))
+                self.product_urls.update(self.parser.get_product_urls(self.get_page(product_index_url)))
             logging.info('generated {} urls'.format(len(self.product_urls)))
 
     def scan_url(self):
         # iterate through self.product_url list
-        bad_urls = []
+        bad_urls = set()
         for product_url in self.product_urls:
             try:
                 product_page = self.get_page(product_url)
@@ -105,11 +110,11 @@ class Listener:
                         self.send_stock(product_url, price, dealer)
                 else:
                     logging.info('remove invalid url: {}'.format(product_url))
-                    bad_urls.append(product_url)
-            except Exception as e: 
+                    bad_urls.add(product_url)
+            except Exception:
                 # if this url causes an exception, append it to bad_urls
                 logging.error('remove erroneous url: {}'.format(product_url))
-                bad_urls.append(product_url)
+                bad_urls.add(product_url)
         # remove all urls in bad_urls from self.product_urls
         if len(bad_urls) != 0:
             for bad_url in bad_urls:
@@ -140,9 +145,11 @@ class Listener:
         msg = 'Stock Refilled!\nDealer:{}\nPrice:{}\nURL:{}'.format(dealer, price, url)
         self.send_msg(msg)
 
+    #TODO: multiple receivers
     def send_msg(self, msg):
-        self.sender.send_message(msg, self.chat_id)
-        logging.info('sent msg to user: {}'.format(msg))
+        for receiver in self.receivers:
+            self.sender.send_message(msg, receiver)
+            logging.info('sent msg to {}: {}'.format(receiver, msg))
     
     def run(self):
         try:

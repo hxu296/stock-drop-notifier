@@ -52,7 +52,6 @@ class NeweggParser:
 
     def get_price(self, product_url, product_page):
         product_soup = soup(product_page, 'lxml')
-        price = -999.0
         if self.is_combo_deal(product_url):
             pane = product_soup.find('tr', {'class':'grand_total'})
             price_str = pane.find('td', {'class':'price'}).contents[0]
@@ -67,7 +66,6 @@ class NeweggParser:
 
     def get_inventory(self, product_url, product_page):
         product_soup = soup(product_page, 'lxml')
-        in_stock = True
         if self.is_combo_deal(product_url):
             inventory = product_soup.find('p', {'class':'note'})   
         else:
