@@ -11,6 +11,7 @@ import logging
 import os
 import signal
 import subprocess
+import re
 from copy import deepcopy
 
 
@@ -171,11 +172,19 @@ class Server:
             reply = '{}\n{}'.format(self.reply_dict['rm_failure'], e.args[0])
             self.send_msg(update, context, reply)
 
+    def unfold_double_quote(self, args):
+        arg = ' '.join(args)
+        without_quote = re.sub(r'"(.*?)"', '', arg).split()
+        with_quote = re.findall(r'"(.*?)"', arg)
+        return with_quote + without_quote
+
     def search(self, args):
-        return self.filter_keys['search'], args
+        search_words = self.unfold_double_quote(args)
+        return self.filter_keys['search'], search_words
 
     def forbid(self, args):
-        return self.filter_keys['forbid'], args
+        forbidden_words = self.unfold_double_quote(args)
+        return self.filter_keys['forbid'], forbidden_words
 
     def price(self, args):
         if len(args) != 1:
@@ -249,7 +258,8 @@ class Server:
             user_data['filter'][e.args[0]['filter_key']] = e.args[0]['filter_val']
 
     def start_listener(self, from_listener_to_config):
-        pid = subprocess.Popen(['python', 'listener.py', '--config', from_listener_to_config]).pid
+        pid = subprocess.Popen(['python', 'listener.py', '--config', from_listener_to_config],
+                               stdout=subprocess.DEVNULL).pid
         return pid
 
     def dump_listener_config(self, config):
@@ -295,4 +305,3 @@ class Server:
         except Exception as e:
             print('server.py: error running server: {}'.format(e))
             logging.critical(str(e))
-            quit()

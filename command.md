@@ -21,13 +21,13 @@ Remove one or more notifiers by id, which can be found using /list. Examples of 
 
 #### !search ####
 This command is used to customize the search_words parameter of a filter, which is a ***required*** parameter filed. To use this command, follow !search with a list of space-separated words for whom a newly added notifier will search. Examples of this command are as follows:
-- !search 3080 
-- !search PlayStation5 PS5
+- !search "Play Station 5", PS5
+- !search 3080 3060ti
 
 #### !forbid ####
 This command is used to customize the forbidden_words parameter of a filter, which is an ***optional*** parameter filed, but we highly recommend using it. The format of this command is similar to that of !search. This command helps to exclude pages that have forbidden_words in product titiles. Examples of this commands are as follows:
-- !forbid combo ssd pc tower
-- !forbid PS4
+- !forbid "Play Station 4" PS4 
+  !forbid 2080 2070 2060
 
 #### !price #### 
 This command is used to customize the price_ceiling parameter of a filter, which is a ***required*** parameter filed. To use this command, follow !price with a non-negative integer. A newly added notifier will stop listening to products that are above this price line. Examples are as follows:
@@ -41,7 +41,7 @@ This command is used to customize the request_frequency parameter of a filter, w
 #### !rest ####
 This command is used to customize the rest_time parameter of a filter, which is an ***optional*** parameter filed. rest_time are two integers in range [0, 23] between which the notifier will stop working. As most websites use request times for scalper detection, this feature is added to improve the stability of notifier. If unspecified, rest_time parameter will default to 23, 8, meaning the notifier will stop working from 23:00 to 8:00. Examples of this commands are as follows:
 - !rest 1 9
-- !rest 0 0
+- !rest 23 8
 
 
 

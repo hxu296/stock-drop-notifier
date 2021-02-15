@@ -1,4 +1,5 @@
 from bs4 import BeautifulSoup as soup
+import urllib.parse
 
 class NeweggParser:
 
@@ -28,7 +29,7 @@ class NeweggParser:
         return product_index_urls
 
     def get_search_url(self, search_str):
-        search_url = self.search_base_url + search_str
+        search_url = self.search_base_url + urllib.parse.quote_plus(search_str)
         return search_url
 
     def get_name(self, product_url, product_page):
@@ -42,7 +43,6 @@ class NeweggParser:
 
     def get_dealer(self, product_url, product_page):
         product_soup = soup(product_page, 'lxml')
-        dealer = 'unknown dealer'
         if self.is_combo_deal(product_url):
             dealer = 'Combo Deal'
         else:

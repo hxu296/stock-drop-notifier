@@ -8,7 +8,7 @@ import os
 import yaml
 import argparse
 import logging
-
+from requests_html import HTMLSession
 class Listener:
     
     def __init__(self, path_to_config):
@@ -30,6 +30,15 @@ class Listener:
         self.parser = Parser()
         self.name = ''.join('[{}]'.format(word) for word in self.search_words)
         self.get_page_time = time.time()
+        self.session = HTMLSession()
+        self.headers = {
+            'User-Agent': 'Mozilla/5.0 (X11; Ubuntu; Linux x86_64; rv:79.0) Gecko/20100101 Firefox/79.0',
+            'Accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,*/*;q=0.8',
+            'Accept-Language': 'en-US,en;q=0.5',
+            'DNT': '1',
+            'Connection': 'keep-alive',
+            'Upgrade-Insecure-Requests': '1',
+        }
 
         self.load_logger()
 
@@ -71,7 +80,6 @@ class Listener:
             rest_time = 0
         return rest_time
 
-
     def generate_url(self):
         self.product_urls = set()
         # generate product urls for each search word
@@ -82,7 +90,7 @@ class Listener:
             # get product urls
             for product_index_url in product_index_urls:
                 self.product_urls.update(self.parser.get_product_urls(self.get_page(product_index_url)))
-            logging.info('generated {} urls'.format(len(self.product_urls)))
+        logging.info('generated {} urls'.format(len(self.product_urls)))
 
     def scan_url(self):
         # iterate through self.product_url list
@@ -126,9 +134,10 @@ class Listener:
         time.sleep(max(1/self.request_frequency - duration, 0))
         self.get_page_time = time.time()
         # get page from request
-        req = requests.get(url, timeout=5)
-        page = req.text
-        logging.debug('got page')
+        req = self.session.get(url, timeout=5, headers=self.headers)
+        req.html.render()
+        page = req.html.html
+        logging.debug('got page from {}'.format(url))
         return page
 
     def time(self):
@@ -145,7 +154,6 @@ class Listener:
         msg = 'Stock Refilled!\nDealer:{}\nPrice:{}\nURL:{}'.format(dealer, price, url)
         self.send_msg(msg)
 
-    #TODO: multiple receivers
     def send_msg(self, msg):
         for receiver in self.receivers:
             self.sender.send_message(msg, receiver)
