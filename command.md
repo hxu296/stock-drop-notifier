@@ -26,8 +26,8 @@ This command is used to customize the search_words parameter of a filter, which 
 
 #### !forbid ####
 This command is used to customize the forbidden_words parameter of a filter, which is an ***optional*** parameter filed, but we highly recommend using it. The format of this command is similar to that of !search. This command helps to exclude pages that have forbidden_words in product titiles. Examples of this commands are as follows:
-- !forbid "Play Station 4" PS4 
-  !forbid 2080 2070 2060
+- !forbid "Play Station 4" PS4
+- !forbid 2080 2070 2060
 
 #### !price #### 
 This command is used to customize the price_ceiling parameter of a filter, which is a ***required*** parameter filed. To use this command, follow !price with a non-negative integer. A newly added notifier will stop listening to products that are above this price line. Examples are as follows:
