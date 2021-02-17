@@ -2,6 +2,4 @@ beautifulsoup4
 lxml
 requests
 pyyaml
-regex
 requests-html
-urllib
