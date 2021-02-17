@@ -129,16 +129,21 @@ class Listener:
                 self.product_urls.remove(bad_url)
     
     def get_page(self, url):
-        # control frequency
-        duration = time.time() - self.get_page_time
-        time.sleep(max(1/self.request_frequency - duration, 0))
-        self.get_page_time = time.time()
-        # get page from request
-        req = self.session.get(url, timeout=5, headers=self.headers)
-        req.html.render()
-        page = req.html.html
-        logging.debug('got page from {}'.format(url))
-        return page
+        try:
+            # control frequency
+            duration = time.time() - self.get_page_time
+            time.sleep(max(1/self.request_frequency - duration, 0))
+            self.get_page_time = time.time()
+            # get page from request
+            req = self.session.get(url, timeout=5, headers=self.headers)
+            req.html.render()
+            page = req.html.html
+            logging.debug('got page from {}'.format(url))
+            return page
+        except Exception as e:
+            # keep refreshing until a successful connection is established
+            logging.error('connection error, keep refreshing. error message: {}'.format(e))
+            return self.get_page(url)
 
     def time(self):
         return time.time() - self.start_time
