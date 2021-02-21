@@ -135,7 +135,7 @@ class Listener:
             time.sleep(max(1/self.request_frequency - duration, 0))
             self.get_page_time = time.time()
             # get page from request
-            req = requests.get(url, timeout=5)
+            req = requests.get(url, headers=self.headers, timeout=5)
             page = req.text
             logging.debug('got page from {}'.format(url))
             return page
