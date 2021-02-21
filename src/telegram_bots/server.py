@@ -106,7 +106,7 @@ class Server:
         self.send_msg(update, context, reply)
         return ConversationHandler.END
 
-    def add(self, update, context, receivers=list()):
+    def add(self, update, context, receivers=None):
         chat_id = update.effective_chat.id
         user_data = context.user_data
         logging.info('received /add from user {}'.format(chat_id))
@@ -118,8 +118,9 @@ class Server:
             curr_filter = deepcopy(user_data['filter'])
             if any([value is None for value in curr_filter.values()]):
                 raise TypeError(self.reply_dict['add_error'])
+            if receivers is None:
+                receivers = [chat_id]
             curr_filter['chat_id'] = chat_id
-            receivers.append(chat_id)
             curr_filter['receivers'] = receivers
             curr_filter['path_to_telegram_config'] = self.config['path_to_telegram_config']
             path_to_listener_config = self.dump_listener_config(curr_filter)
@@ -143,6 +144,7 @@ class Server:
             if len(args) == 0 or any([not arg.isnumeric() for arg in args]):
                 raise TypeError(self.reply_dict['addshare_error'])
             receivers = [int(arg) for arg in args]
+            receivers += chat_id
             self.add(update, context, receivers)
         except Exception as e:
             logging.error('/addshare request from user {} encounters an error: {}'.format(
