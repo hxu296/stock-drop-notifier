@@ -1,5 +1,6 @@
 from telegram_bots.sender import Sender
-from parsers.newegg_parser import NeweggParser as Parser
+from parsers.bestbuy_parser import BestbuyParser
+from parsers.newegg_parser import NeweggParser
 from datetime import datetime
 from datetime import timedelta
 import time
@@ -8,7 +9,7 @@ import os
 import yaml
 import argparse
 import logging
-from requests_html import HTMLSession
+
 class Listener:
     
     def __init__(self, path_to_config):
@@ -27,10 +28,10 @@ class Listener:
         self.request_frequency = self.config['request_frequency']
         self.update_interval = self.config['update_interval']
         self.needs_update = True
-        self.parser = Parser()
+        self.platform = self.config['platform']
+        self.parser = self.get_parser()
         self.name = ''.join('[{}]'.format(word) for word in self.search_words)
         self.get_page_time = time.time()
-        self.session = HTMLSession()
         self.headers = {
             'User-Agent': 'Mozilla/5.0 (X11; Ubuntu; Linux x86_64; rv:79.0) Gecko/20100101 Firefox/79.0',
             'Accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,*/*;q=0.8',
@@ -42,10 +43,18 @@ class Listener:
 
         self.load_logger()
 
-        initial_msg = '{} bot starts running'.format(self.name)
+        initial_msg = '{} {} bot starts running'.format(self.platform, self.name)
         if len(self.receivers) > 1:
             initial_msg = 'shared ' + initial_msg
         self.send_msg(initial_msg)
+
+    def get_parser(self):
+        if self.platform == 'newegg':
+            return NeweggParser()
+        elif self.platform == 'bestbuy':
+            return BestbuyParser()
+        else:
+            return None
 
     def load_logger(self):
         if not os.path.exists('log/listener_log/user_{}'.format(self.chat_id)):
@@ -53,7 +62,7 @@ class Listener:
         path_to_log = 'log/listener_log/user_{}/{}.log'.format(self.chat_id, self.name)
         os.popen('touch {}'.format(path_to_log))
         logging.basicConfig(format='%(asctime)s - %(name)s - %(levelname)s - %(message)s',
-                            level=logging.INFO, filename=path_to_log, filemode='w')
+                            level=logging.DEBUG, filename=path_to_log, filemode='w')
 
     def load_config(self, path_to_config):
         with open(path_to_config, 'r') as handler:

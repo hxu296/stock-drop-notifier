@@ -29,14 +29,16 @@ class Server:
                            'price': self.price,
                            'rest': self.rest,
                            'freq': self.freq,
-                           'refresh': self.refresh}
+                           'refresh': self.refresh,
+                           'platform': self.platform,}
         self.filter_keys = {
             'search': 'search_words',
             'forbid': 'forbidden_words',
             'price': 'price_ceiling',
             'freq': 'request_frequency',
             'refresh': 'update_interval',
-            'rest': 'rest_time'
+            'rest': 'rest_time',
+            'platform': 'platform',
         }
 
     def send_msg(self, update, context, reply, markup=None):
@@ -225,13 +227,22 @@ class Server:
         refresh = int(args[0])
         return self.filter_keys['refresh'], refresh
 
+    def platform(self, args):
+        if len(args) != 1:
+            raise TypeError(self.reply_dict['platform_error'])
+        elif args[0] != 'newegg' and args[0] != 'bestbuy':
+            raise TypeError(self.reply_dict['platform_error'])
+        platform = args[0]
+        return self.filter_keys['platform'], platform
+
     def new_filter(self):
         new_filter = {self.filter_keys['freq']: self.config['default_request_frequency'],
                       self.filter_keys['refresh']: self.config['default_update_interval'],
                       self.filter_keys['rest']: self.config['default_rest_time'],
                       self.filter_keys['forbid']: self.config['default_forbidden_words'],
                       self.filter_keys['search']: None,
-                      self.filter_keys['price']: None
+                      self.filter_keys['price']: None,
+                      self.filter_keys['platform']: None,
                       }
         return new_filter
 
@@ -298,7 +309,7 @@ class Server:
         rm_handler = CommandHandler('rm', self.rm)
         dispatcher.add_handler(rm_handler)
 
-        filter_handler = PrefixHandler('!', ['search', 'forbid', 'price', 'rest', 'freq', 'refresh'], self.filter)
+        filter_handler = PrefixHandler('!', ['search', 'forbid', 'price', 'rest', 'freq', 'refresh', 'platform'], self.filter)
         dispatcher.add_handler(filter_handler)
 
         try:

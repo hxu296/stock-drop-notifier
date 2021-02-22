@@ -34,7 +34,6 @@ class NeweggParser:
 
     def get_name(self, product_url, product_page):
         product_soup = soup(product_page, 'lxml')
-        name = 'unknown name'
         if self.is_combo_deal(product_url):
             name = product_soup.find('span', {'itemprop':'name'}).contents[0]
         else:
