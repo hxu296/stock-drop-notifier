@@ -43,7 +43,7 @@ class Listener:
 
         self.load_logger()
 
-        initial_msg = '{} {} bot starts running'.format(self.platform, self.name)
+        initial_msg = '{} bot starts running'.format(self.name)
         if len(self.receivers) > 1:
             initial_msg = 'shared ' + initial_msg
         self.send_msg(initial_msg)
@@ -62,7 +62,7 @@ class Listener:
         path_to_log = 'log/listener_log/user_{}/{}.log'.format(self.chat_id, self.name)
         os.popen('touch {}'.format(path_to_log))
         logging.basicConfig(format='%(asctime)s - %(name)s - %(levelname)s - %(message)s',
-                            level=logging.DEBUG, filename=path_to_log, filemode='w')
+                            level=logging.INFO, filename=path_to_log, filemode='w')
 
     def load_config(self, path_to_config):
         with open(path_to_config, 'r') as handler:

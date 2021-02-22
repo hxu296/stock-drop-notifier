@@ -146,7 +146,7 @@ class Server:
             if len(args) == 0 or any([not arg.isnumeric() for arg in args]):
                 raise TypeError(self.reply_dict['addshare_error'])
             receivers = [int(arg) for arg in args]
-            receivers += chat_id
+            receivers.append(chat_id)
             self.add(update, context, receivers)
         except Exception as e:
             logging.error('/addshare request from user {} encounters an error: {}'.format(
