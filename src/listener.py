@@ -30,7 +30,7 @@ class Listener:
         self.needs_update = True
         self.platform = self.config['platform']
         self.parser = self.get_parser()
-        self.name = self.platform.join('[{}]'.format(word) for word in self.search_words)
+        self.name = self.platform + ''.join('[{}]'.format(word) for word in self.search_words)
         self.get_page_time = time.time()
         self.headers = {
             'User-Agent': 'Mozilla/5.0 (X11; Ubuntu; Linux x86_64; rv:79.0) Gecko/20100101 Firefox/79.0',
