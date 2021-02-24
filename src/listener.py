@@ -9,6 +9,7 @@ import os
 import yaml
 import argparse
 import logging
+import urllib.parse
 
 class Listener:
     
@@ -30,8 +31,11 @@ class Listener:
         self.needs_update = True
         self.platform = self.config['platform']
         self.parser = self.get_parser()
-        self.name = self.platform + ''.join('[{}]'.format(word) for word in self.search_words)
+        self.name = self.platform + ''.join('[{}]'.format(urllib.parse.quote_plus(word)) for word in self.search_words)
         self.get_page_time = time.time()
+        self.product_urls = set()
+        self.prev_in_stock = set()
+        self.curr_in_stock = set()
         self.headers = {
             'User-Agent': 'Mozilla/5.0 (X11; Ubuntu; Linux x86_64; rv:79.0) Gecko/20100101 Firefox/79.0',
             'Accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,*/*;q=0.8',
@@ -121,10 +125,21 @@ class Listener:
                     if word in name.split():
                         name_is_valid = False
                         break
-                # send stock if product's name is valid and it is in stock and it is cheaper than price ceiling
+                # send stock and update curr_in_stock
                 if price <= self.price_ceiling and name_is_valid:
-                    if is_in_stock:
-                        self.send_stock(product_url, price, dealer)
+                    product_info = (product_url, price, dealer)
+                    logging.critical(self.prev_in_stock)
+                    logging.critical('is_in_stock:'+str(is_in_stock))
+                    logging.critical('in prev_in_stock:' + str(product_info in self.prev_in_stock))
+                    if is_in_stock and product_info in self.prev_in_stock:
+                        self.curr_in_stock.add(product_info)
+                    elif is_in_stock and product_info not in self.prev_in_stock:
+                        self.send_new_stock(product_info)
+                        self.curr_in_stock.add(product_info)
+                    elif not is_in_stock and product_info in self.prev_in_stock:
+                        self.send_dead_stock(product_info)
+                    elif not is_in_stock and product_info not in self.prev_in_stock:
+                        pass
                 else:
                     logging.info('remove invalid url: {}'.format(product_url))
                     bad_urls.add(product_url)
@@ -136,7 +151,10 @@ class Listener:
         if len(bad_urls) != 0:
             for bad_url in bad_urls:
                 self.product_urls.remove(bad_url)
-    
+        # update prev_in_stock and curr_in_stock
+        self.prev_in_stock = self.curr_in_stock
+        self.curr_in_stock = set()
+        
     def get_page(self, url):
         try:
             # control frequency
@@ -163,8 +181,16 @@ class Listener:
         run_hrs = int(run_time / 3600)
         return run_hrs, run_mins, run_secs
 
-    def send_stock(self, url, price, dealer):
+    def send_new_stock(self, product_info):
+        # send new stock available
+        url, price, dealer = product_info
         msg = 'Stock Refilled!\nDealer:{}\nPrice:{}\nURL:{}'.format(dealer, price, url)
+        self.send_msg(msg)
+
+    def send_dead_stock(self, product_info):
+        # send stock that was previously available, but no longer
+        url, price, dealer = product_info
+        msg = 'Below product is no longer available.\nDealer:{}\nPrice:{}\nURL:{}'.format(dealer, price, url)
         self.send_msg(msg)
 
     def send_msg(self, msg):
