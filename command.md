@@ -19,6 +19,11 @@ Remove one or more notifiers by id, which can be found using /list. Examples of 
 - /rm 12391
 - /rm 31259 50028
 
+#### !platform ####
+This command is used to customize the platform parameter of a filter, which is a ***required*** parameter filed. To use this command, follow !search with either the word newegg or bestbuy for whom a newly added notifier will scrape on. Examples of this command are as follows:
+- !platform newegg
+- !platform bestbuy
+
 #### !search ####
 This command is used to customize the search_words parameter of a filter, which is a ***required*** parameter filed. To use this command, follow !search with a list of space-separated words for whom a newly added notifier will search. Examples of this command are as follows:
 - !search "Play Station 5", PS5
@@ -42,6 +47,7 @@ This command is used to customize the request_frequency parameter of a filter, w
 This command is used to customize the rest_time parameter of a filter, which is an ***optional*** parameter filed. rest_time are two integers in range [0, 23] between which the notifier will stop working. As most websites use request times for scalper detection, this feature is added to improve the stability of notifier. If unspecified, rest_time parameter will default to 23, 8, meaning the notifier will stop working from 23:00 to 8:00. Examples of this commands are as follows:
 - !rest 1 9
 - !rest 23 8
+
 
 
 

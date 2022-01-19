@@ -5,12 +5,13 @@ This project is still at the early stage of development. To run it as it is, you
 1. run the following commands to set up the run time environment. 
  ```
     git clone https://github.com/hxu296/StockDropNotifier.git 
+    git checkout stable
     cd StockDropNotifier
-    pip install -r requirements.txt
-    pip install python-telegram-bot --upgrade
+    pip3 install -r requirements.txt
+    pip3 install python-telegram-bot --upgrade
 ```
 2. receive your telegram bot token from BotFather.
-3. run `pythone3.8 run.py -m` from the project root directory and paste your bot token according to the instruction.
+3. run `python3 run.py -m` from the project root directory and paste your bot token according to the instruction.
 4. talk to your Telegram bot using commands from [command.md](command.md)
 
 ### About

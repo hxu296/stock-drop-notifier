@@ -27,6 +27,7 @@ def main():
         token = get_token()
         rewrite_token(token, path_to_config)
     server = Server(path_to_config)
+    print('server starts running!')
     server.run()
 
 if __name__ == "__main__":

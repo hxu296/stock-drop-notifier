@@ -1,5 +1,28 @@
-start: "Nice to meet you!\n\nMy name is StockDrop, and I'm your notifier manager. command instruction needs update. Refer to command.md for the most recent info."
-help: "command instruction needs update. Refer to command.md for the most recent info. "
+start: "Nice to meet you!\n\nMy name is StockDrop, and I'm your notifier manager. Try /help commands to get started."
+help: |
+         /help: Show the command help page.
+         /list: List filter or notifier information. Upon sending /list, a keyboard menu will show up for more options. This command does not require any parameter.
+         /add: Add a notifier using the current filter. This command does not require any parameter, but it can only be used after all required fields of filter are specified.
+         /rm: Remove one or more notifiers by id, which can be found using /list. Examples of this command are as follows:
+            - /rm 12391
+            - /rm 31259 50028
+         !platform: This command is used to customize the platform parameter of a filter, which is a *required* parameter filed. To use this command, follow !search with either the word newegg or bestbuy for whom a newly added notifier will scrape on. Examples of this command are as follows:
+            - !platform newegg
+            - !platform bestbuy
+         !search: This command is used to customize the search_words parameter of a filter, which is a *required* parameter filed. To use this command, follow !search with a list of space-separated words for whom a newly added notifier will search. Examples of this command are as follows:
+            - !search "Play Station 5", PS5
+            - !search 3080 3060ti
+         !forbid : This command is used to customize the forbidden_words parameter of a filter, which is an *optional* parameter filed, but we highly recommend using it. The format of this command is similar to that of !search. This command helps to exclude pages that have forbidden_words in product titiles. Examples of this commands are as follows:
+            - !forbid "Play Station 4" PS4
+            - !forbid 2080 2070 2060
+         !price: This command is used to customize the price_ceiling parameter of a filter, which is a *required* parameter filed. To use this command, follow !price with a non-negative integer. A newly added notifier will stop listening to products that are above this price line. Examples are as follows:
+             - !price 1000 
+         !freq: This command is used to customize the request_frequency parameter of a filter, which is an *optional* parameter field. request_frequency is a non-negative floating-point number where, for example, 0.2 means sending 0.2 query per second to newegg, effectively equivalent to waiting 5 seconds before next refresh. As websites also use request frequency for scalper detection, there is a trade off between notifier efficiency and stability. If unspecified, request_frequency will default to 0.3, which is found to be the sweet point of this trade off. Examples of this commands are as follows:
+             - !freq 0.2
+             - !freq 0.5
+         !rest: This command is used to customize the rest_time parameter of a filter, which is an *optional* parameter filed. rest_time are two integers in range [0, 23] between which the notifier will stop working. As most websites use request times for scalper detection, this feature is added to improve the stability of notifier. If unspecified, rest_time parameter will default to 23, 8, meaning the notifier will stop working from 23:00 to 8:00. Examples of this commands are as follows:
+             - !rest 1 9
+             - !rest 23 8
 list_start: "Please select the type you want to list."
 list_choice: "Press for more information."
 list_empty: "No information to display."
