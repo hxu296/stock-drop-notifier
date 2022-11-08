@@ -1,7 +1,7 @@
 # Stock Drop Notifier
 
 ## Quick Start
-*Note: you don't need to host Stock Drop Notifier to use it. Simpy talk to the Telegram bot [@StockDropBot](https://telegram.me/StockDropBot) to use the service.*
+*Note: you don't need to host Stock Drop Notifier to use it. Simply talk to the Telegram bot [@StockDropBot](https://telegram.me/StockDropBot) to use the service.*
 
 To host Stock Drop Notifier, follow the steps below. Hosting requires a Unix-like system with Python 3.6+ installed:
 1. run the following commands to set up the run time environment. 
