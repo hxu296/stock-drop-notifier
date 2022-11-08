@@ -1,7 +1,9 @@
 # Stock Drop Notifier
 
 ## Quick Start
-This project is still at the early stage of development. To run it as it is, you need to do the following:
+*Note: you don't need to host Stock Drop Notifier to use it. Simpy talk to the Telegram bot [@StockDropBot](https://telegram.me/StockDropBot) to use the service.*
+
+To host Stock Drop Notifier, follow the steps below. Hosting requires a Unix-like system with Python 3.6+ installed:
 1. run the following commands to set up the run time environment. 
  ```
     git clone https://github.com/hxu296/stock-drop-notifier.git
@@ -10,7 +12,7 @@ This project is still at the early stage of development. To run it as it is, you
     pip3 install -r requirements.txt
     pip3 install python-telegram-bot --upgrade
 ```
-2. receive your telegram bot token from BotFather.
+2. receive your telegram bot token from [@BotFather](https://telegram.me/BotFather).
 3. run `python3 run.py -m` from the project root directory and paste your bot token according to the instruction.
 4. talk to your Telegram bot using commands from [command.md](command.md)
 
