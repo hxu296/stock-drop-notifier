@@ -4,8 +4,8 @@
 This project is still at the early stage of development. To run it as it is, you need to do the following:
 1. run the following commands to set up the run time environment. 
  ```
-    git clone https://github.com/hxu296/StockDropNotifier.git 
-    cd StockDropNotifier
+    git clone https://github.com/hxu296/stock-drop-notifier.git
+    cd stock-drop-notifier
     git checkout stable
     pip3 install -r requirements.txt
     pip3 install python-telegram-bot --upgrade
