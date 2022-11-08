@@ -61,12 +61,13 @@ class Listener:
             return None
 
     def load_logger(self):
-        if not os.path.exists('log/listener_log/user_{}'.format(self.chat_id)):
-            os.popen('mkdir log/listener_log/user_{}'.format(self.chat_id))
-        path_to_log = 'log/listener_log/user_{}/{}.log'.format(self.chat_id, self.name)
-        os.popen('touch {}'.format(path_to_log))
+        path_to_log_dir = 'log/listener_log/user_{}'.format(self.chat_id)
+        if not os.path.exists(path_to_log_dir):
+            os.makedirs(path_to_log_dir)
+        path_to_log = '{}/{}.log'.format(path_to_log_dir, self.name)
+        # create file if not exist, append if exist
         logging.basicConfig(format='%(asctime)s - %(name)s - %(levelname)s - %(message)s',
-                            level=logging.INFO, filename=path_to_log, filemode='w')
+                            level=logging.INFO, filename=path_to_log, filemode='a')
 
     def load_config(self, path_to_config):
         with open(path_to_config, 'r') as handler:
