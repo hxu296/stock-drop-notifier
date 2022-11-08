@@ -271,7 +271,7 @@ class Server:
             user_data['filter'][e.args[0]['filter_key']] = e.args[0]['filter_val']
 
     def start_listener(self, from_listener_to_config):
-        pid = subprocess.Popen(['python', 'listener.py', '--config', from_listener_to_config],
+        pid = subprocess.Popen(['python3', 'listener.py', '--config', from_listener_to_config],
                                stdout=subprocess.DEVNULL).pid
         return pid
 
