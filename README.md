@@ -3,7 +3,7 @@
 ## Index
 - [About](#about)
 - [Use Case Demo](#use-case-demo)
-- [Unique Features](#unique-feature)
+- [Unique Features](#unique-features)
 - [Installation](#installation)
 - [Project Architecture](#project-architecture)
 
