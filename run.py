@@ -2,8 +2,12 @@ from src.telegram_bots.server import Server
 import argparse
 import yaml
 import re
+import os
 
 def get_token():
+    # first try to get token from env var, if failed, try to get token from stdin
+    token = os.getenv('TELEGRAM_BOT_TOKEN')
+    if token is not None: return token
     token = input("paste your Telegram bot token and press enter: ")
     token = token.strip()
     if not bool(re.search("[0-9]{8,10}:[a-zA-Z0-9_-]{35}", token)):
