@@ -1,6 +1,6 @@
 # Stock Drop Notifier
 ![stock-drop-notifier](https://socialify.git.ci/hxu296/stock-drop-notifier/image?font=Inter&forks=1&issues=1&language=1&owner=1&pulls=1&stargazers=1&theme=Light)
-
+![build](https://github.com/hxu296/stock-drop-notifier/actions/workflows/docker-image.yml/badge.svg)
 ## Index
 - [About](#about)
 - [Use Case Demo](#use-case-demo)
@@ -9,7 +9,6 @@
 - [Project Architecture](#project-architecture)
 
 ## About
-
 Stock Drop Notifier will monitor the stock information for an user-specified product on www.newegg.com and send Telegram message for real time stock update. Users can send Telegram command to customize a search filter, spawn new notifiers, and terminate old notifiers. Simply talk to the Telegram bot [@StockDropBot](https://telegram.me/StockDropBot) to use the service.
 
 
