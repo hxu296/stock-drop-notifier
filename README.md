@@ -1,6 +1,11 @@
 # Stock Drop Notifier
 ![stock-drop-notifier](https://socialify.git.ci/hxu296/stock-drop-notifier/image?font=Inter&forks=1&issues=1&language=1&owner=1&pulls=1&stargazers=1&theme=Light)
-![build](https://github.com/hxu296/stock-drop-notifier/actions/workflows/docker-image.yml/badge.svg)
+<div align="center">
+
+  <a href="">![build](https://github.com/hxu296/stock-drop-notifier/actions/workflows/docker-image.yml/badge.svg)</a>
+
+</div>
+
 ## Index
 - [About](#about)
 - [Use Case Demo](#use-case-demo)
