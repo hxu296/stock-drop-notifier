@@ -13,10 +13,6 @@ Stock Drop Notifier will monitor the stock information for an user-specified pro
 
 
 ## Use Case Demo
-Add a notifier to monitor all products on `Newegg` that:
-- contain any of the keywords `4080`, `RTX 4080`, `4090`, or `RTX 4090`
-- don't contain any of the keywords `mid tower`, `PC`, or `ATX` (exclude PC cases)
-- have a price lower than `$1200`
 
 | Use case      | Screenshot |
 | ----------- | ----------- |
