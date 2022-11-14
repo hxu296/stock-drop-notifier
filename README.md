@@ -52,14 +52,14 @@ Finally, features of Stock Drop Notifier can be accessed through a Telegram bot.
 
 1. Receive and copy your telegram bot token from [@BotFather](https://telegram.me/BotFather).
 2. Make sure your host machine has a Unix-like system with Python 3.6+ installed.
-3. Run the following commands to set up the environment and start the bot.
+3. Run the following commands to set up the environment.
  ```
     git clone https://github.com/hxu296/stock-drop-notifier.git
     cd stock-drop-notifier
     pip3 install -r requirements.txt
     pip3 install python-telegram-bot --upgrade
 ```
-4. Run `python3 run.py -m` from the project root directory and paste your bot token according to the instruction.
+4. To start the bot, run `python3 run.py -m` from the project root directory and paste your bot token according to the instruction.
 4. You can now talk to your Telegram bot using commands from [command.md](command.md).
 
 
